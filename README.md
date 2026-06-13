@@ -1,12 +1,10 @@
-# BitStatus
+<p align="center">
+  <img src="./Bitstatus-logo.png" width="160" alt="BitStatus">
+</p>
 
-`Bitcoin · self-hosted` · `Runs on Umbrel` · `License: MIT`
+<h1 align="center">BitStatus</h1>
 
-<img src="./web/logo.png" width="120">
-
-> ⚠️ **Placeholders de marca:** `web/logo.png`, `web/icon.png` e `icon.png` son los
-> assets heredados del proyecto original. Sustitúyelos por tu propia marca BitStatus
-> antes de publicar.
+<p align="center"><code>Bitcoin · self-hosted</code> · <code>Runs on Umbrel</code> · <code>License: MIT</code></p>
 
 Monitoriza los saldos de tus wallets Bitcoin de forma privada, desde tu propio nodo.
 
