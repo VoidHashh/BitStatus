@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: bitstatus_app_1
+      APP_PORT: 3710
+
+  app:
+    # Pineada por digest. Sustituye el sha256 por el que devuelva `docker push`
+    # (ver README -> "Construir y publicar la imagen").
+    image: ghcr.io/voidhashh/bitstatus:1.0.0@sha256:REEMPLAZAR_CON_DIGEST_REAL
+    restart: on-failure
+    stop_grace_period: 1m
+    environment:
+      PORT: 3710
+      ELECTRUM_HOST: $APP_ELECTRS_NODE_IP
+      ELECTRUM_PORT: $APP_ELECTRS_NODE_PORT
+      # Precio fiat OPCIONAL. Apúntalo a tu mempool local de Umbrel.
+      # Vacío o ausente = modo solo-BTC, sin ninguna petición saliente.
+      # PRICE_API_URL: http://10.21.0.0:3006/api/v1/prices
+    volumes:
+      - ${APP_DATA_DIR}/data:/data

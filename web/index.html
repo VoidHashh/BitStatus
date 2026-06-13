@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="description" content="Monitoriza los saldos de tus wallets Bitcoin (XPUB/YPUB/ZPUB) desde tu propio nodo">
+  <meta name="application-name" content="BitStatus">
+  <meta name="author" content="VoidHashh">
+
+  <title>BitStatus</title>
+
+  <link rel="icon" type="image/png" href="/icon.png">
+  <meta name="theme-color" content="#0f1115">
+
+  <link rel="stylesheet" href="/style.css?v=1">
+
+  <!-- Librería vendorizada y servida localmente: ningún script de terceros en runtime. -->
+  <script src="/vendor/chart.umd.min.js"></script>
+  <script src="/scripts.js" defer></script>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-title">
+      <img src="/logo.png" alt="BitStatus" class="logo" style="width: 50px; height: 50px;" />
+      <h1>BitStatus <span id="app_version"></span></h1>
+    </div>
+
+    <div class="header-buttons">
+      <button class="btn btn-ghost fiat" id="currencyToggle" title="Cambiar moneda fiat">EUR</button>
+      <button class="btn btn-primary" id="addBtn">Añadir wallet</button>
+      <button class="btn btn-primary" id="refreshBtn">Actualizar</button>
+    </div>
+
+  </header>
+
+  <div class="container">
+
+    <div class="card total-wrapper">
+
+      <div class="metric main-metric">
+        <div class="label">Saldo total</div>
+        <div id="totalTop" class="big-value">0.00000000 BTC</div>
+        <div id="totalFiat" class="sub-value fiat"></div>
+      </div>
+
+      <div class="metric side-metric fiat">
+
+        <div class="icon">
+          <svg viewBox="0 0 24 24" class="icon-svg">
+            <path d="M5 18V6M5 18h14M8 14l3-3 3 2 4-5" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+
+        <div>
+          <div class="label">Precio BTC</div>
+          <div id="btcPrice" class="side-value"></div>
+        </div>
+      </div>
+
+      <div class="metric side-metric">
+
+        <div class="icon">
+          <svg viewBox="0 0 24 24" class="icon-svg">
+            <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1.9" />
+            <path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </div>
+
+        <div>
+          <div class="label">Actualizado</div>
+          <div id="lastUpdated" class="side-value"></div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <table id="t">
+
+        <thead>
+          <tr>
+            <th>Wallet</th>
+            <th class="percentage">%</th>
+            <th class="balance">BTC</th>
+            <th class="chevron"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td colspan="4" class="loading">Cargando...</td>
+          </tr>
+        </tbody>
+
+      </table>
+
+      <canvas id="chart"></canvas>
+
+    </div>
+
+  </div>
+
+  <footer>
+    <span>BitStatus, mantenido por
+      <a href="https://github.com/VoidHashh/BitStatus" target="_blank" rel="noopener noreferrer">VoidHashh</a></span>
+    <span class="footer-sep">·</span>
+    <span>fork de bitBalance, creado por egzola</span>
+  </footer>
+
+</body>
+
+</html>

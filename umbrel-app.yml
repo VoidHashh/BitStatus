@@ -1,0 +1,36 @@
+manifestVersion: 1.1
+id: bitstatus
+name: BitStatus
+tagline: Monitoriza tus saldos Bitcoin de forma privada desde tu propio nodo
+category: bitcoin
+version: "1.0.0"
+port: 3710
+description: >-
+  Monitoriza los saldos de tus wallets Bitcoin de forma privada, sin que tu
+  xpub salga nunca de tu nodo.
+
+
+  BitStatus es un rastreador watch-only para claves extendidas XPUB, YPUB y ZPUB.
+  Deriva las direcciones localmente y consulta los saldos contra tu propio Electrs,
+  sin depender de APIs de terceros.
+
+
+  Por defecto no realiza ninguna petición saliente a Internet: el frontend no carga
+  scripts de CDN y el precio fiat es totalmente opcional (configurable para apuntar a
+  tu mempool local). Tus wallets, tu nodo, tu privacidad.
+
+
+  Soporta múltiples wallets, escaneo con gap limit y actualización de saldos en tiempo
+  real desde tu nodo Umbrel. Fork de bitBalance (egzola), reescrito para ser
+  autocontenido y sin llamadas externas.
+developer: VoidHashh
+website: https://github.com/VoidHashh/BitStatus
+repo: https://github.com/VoidHashh/BitStatus
+support: https://github.com/VoidHashh/BitStatus/issues
+submitter: VoidHashh
+submission: ""
+path: ""
+dependencies:
+  - electrs
+gallery: []
+releaseNotes: ""
