@@ -17,8 +17,9 @@ services:
       PORT: 3710
       ELECTRUM_HOST: $APP_ELECTRS_NODE_IP
       ELECTRUM_PORT: $APP_ELECTRS_NODE_PORT
-      # Precio fiat OPCIONAL. Apúntalo a tu mempool local de Umbrel.
-      # Vacío o ausente = modo solo-BTC, sin ninguna petición saliente.
-      # PRICE_API_URL: http://10.21.0.0:3006/api/v1/prices
+      # Precio fiat desde la mempool LOCAL de tu Umbrel (no Internet).
+      # Si tu Umbrel usa DHCP y cambia de IP, pon IP fija o usa la IP interna del
+      # servicio mempool. Vacía/ausente = modo solo-BTC, sin peticiones salientes.
+      PRICE_API_URL: http://192.168.8.188:3006/api/v1/prices
     volumes:
       - ${APP_DATA_DIR}/data:/data
