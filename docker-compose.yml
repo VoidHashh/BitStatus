@@ -17,9 +17,13 @@ services:
       PORT: 3710
       ELECTRUM_HOST: $APP_ELECTRS_NODE_IP
       ELECTRUM_PORT: $APP_ELECTRS_NODE_PORT
-      # Precio fiat desde la mempool LOCAL de tu Umbrel (no Internet).
-      # Si tu Umbrel usa DHCP y cambia de IP, pon IP fija o usa la IP interna del
-      # servicio mempool. Vacía/ausente = modo solo-BTC, sin peticiones salientes.
-      PRICE_API_URL: http://192.168.8.188:3006/api/v1/prices
+      # Precio fiat desde la mempool LOCAL de tu Umbrel por su RUTA INTERNA: no expone
+      # tu IP de LAN ni depende de DHCP. Usa las variables que Umbrel inyecta para la
+      # app mempool (requiere 'mempool' en dependencies, ver umbrel-app.yml).
+      # Vacía/ausente = modo solo-BTC, sin ninguna petición saliente.
+      PRICE_API_URL: http://$APP_MEMPOOL_IP:$APP_MEMPOOL_PORT/api/v1/prices
+      # Fallback por IP de tu LAN si la variable interna no resolviera en tu umbrelOS
+      # (sustituye TU_IP_UMBREL por la IP local de tu nodo):
+      # PRICE_API_URL: http://TU_IP_UMBREL:3006/api/v1/prices
     volumes:
       - ${APP_DATA_DIR}/data:/data

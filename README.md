@@ -49,7 +49,7 @@ Esta es la lista **real y completa** de tráfico de red que genera la app:
 | Origen | Destino | ¿Cuándo? | Configurable |
 |--------|---------|----------|--------------|
 | Servidor BitStatus | Electrs local (TCP) | Al escanear saldos | `ELECTRUM_HOST` / `ELECTRUM_PORT` |
-| Servidor BitStatus | API de precio | Solo si defines `PRICE_API_URL` | `PRICE_API_URL` (vacío = desactivado) |
+| Servidor BitStatus | mempool local (HTTP) | Solo si defines `PRICE_API_URL` | `PRICE_API_URL` (vacío = desactivado) |
 | Navegador | Servidor BitStatus (mismo origen) | Siempre | — |
 
 **Por defecto no se hace ninguna petición saliente a Internet.** El frontend no carga
@@ -57,17 +57,22 @@ ningún script de terceros: Chart.js está vendorizado en `web/vendor/` y servid
 localmente. Si no defines `PRICE_API_URL`, la app funciona en **modo solo-BTC** (sin
 fiat) sin contactar con nadie fuera de tu nodo.
 
-### Precio fiat (opcional)
+### Precio fiat (opcional, desde tu mempool local)
 
-Para mostrar el valor en EUR/USD, apunta `PRICE_API_URL` al endpoint de precios de **tu
-mempool local de Umbrel** (no a Internet):
+Para mostrar el valor en EUR/USD, `PRICE_API_URL` apunta al endpoint de precios de **tu
+app mempool de Umbrel** (no a Internet). Para no exponer ninguna IP de LAN ni depender de
+DHCP, se usa la **ruta interna** que Umbrel inyecta para la app mempool, por lo que
+`mempool` está declarada como dependencia en `umbrel-app.yml`:
 
 ```
-PRICE_API_URL=http://<IP_mempool_local>:3006/api/v1/prices
+PRICE_API_URL=http://$APP_MEMPOOL_IP:$APP_MEMPOOL_PORT/api/v1/prices
 ```
 
-El servidor (no el navegador) consulta esa URL, cachea el resultado 60 s y se lo sirve
-al frontend. Se espera una respuesta tipo mempool.space: `{ "USD": 12345, "EUR": 11000 }`.
+Si tu versión de umbrelOS no resolviera esa variable, el `docker-compose.yml` incluye un
+*fallback* comentado por IP de LAN (`http://<IP_de_tu_umbrel>:3006/api/v1/prices`).
+
+El servidor (no el navegador) consulta esa URL, cachea el resultado 60 s y se lo sirve al
+frontend. Respuesta esperada (formato mempool): `{ "USD": 12345, "EUR": 11000 }`.
 Moneda por defecto: **EUR** (con botón para alternar a USD).
 
 ---

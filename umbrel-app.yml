@@ -32,5 +32,6 @@ submission: ""
 path: ""
 dependencies:
   - electrs
+  - mempool
 gallery: []
 releaseNotes: ""
