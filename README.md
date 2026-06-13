@@ -150,18 +150,38 @@ ELECTRUM_HOST=127.0.0.1 ELECTRUM_PORT=50001 npm start
 ```bash
 # 1) Login en GHCR (necesita un PAT con write:packages)
 echo "$GHCR_PAT" | docker login ghcr.io -u VoidHashh --password-stdin
+```
 
-# 2) Build
+### Opción A — single-arch (la imagen ya pineada en docker-compose.yml)
+
+```bash
+# 2) Build (linux/amd64 en Docker Desktop x86)
 docker build -t ghcr.io/voidhashh/bitstatus:1.0.0 .
 
 # 3) Push
 docker push ghcr.io/voidhashh/bitstatus:1.0.0
 
-# 4) Obtén el digest para pinear en docker-compose.yml
+# 4) Lee el digest para pinear en docker-compose.yml
 docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/voidhashh/bitstatus:1.0.0
 ```
 
-Copia el `@sha256:...` resultante a la línea `image:` de `docker-compose.yml`.
+### Opción B — multi-arch (recomendado para Umbrel: cubre Raspberry Pi arm64 y x86)
+
+```bash
+# Construye y publica amd64 + arm64 en un único manifest-list y muestra su digest
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t ghcr.io/voidhashh/bitstatus:1.0.0 \
+  --push .
+
+# Lee el digest del manifest-list publicado
+docker buildx imagetools inspect ghcr.io/voidhashh/bitstatus:1.0.0 \
+  --format '{{json .Manifest.Digest}}'
+```
+
+Copia el `@sha256:...` resultante a la línea `image:` de `docker-compose.yml`. El digest
+ya pineado (`sha256:35630ac6…`) corresponde a la imagen **linux/amd64** construida y
+verificada en este repo; re-pinéalo si publicas multi-arch o reconstruyes en otra máquina.
 
 ---
 
