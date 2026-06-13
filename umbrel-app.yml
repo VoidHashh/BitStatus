@@ -3,7 +3,7 @@ id: bitstatus
 name: BitStatus
 tagline: Monitoriza tus saldos Bitcoin de forma privada desde tu propio nodo
 category: bitcoin
-version: "1.0.0"
+version: "1.0.1"
 port: 3710
 description: >-
   Monitoriza los saldos de tus wallets Bitcoin de forma privada, sin que tu

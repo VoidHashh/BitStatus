@@ -10,7 +10,7 @@ services:
     # Pineada por digest. Este es el digest de la imagen construida y verificada
     # localmente (linux/amd64). Tras hacer `docker push` confírmalo —y, si publicas
     # multi-arch con buildx, re-pinea— con el comando del README ("Construir y publicar").
-    image: ghcr.io/voidhashh/bitstatus:1.0.0@sha256:807e4f930c7ee70b2e60324556f2f13fc64ec6289d2014a1881e65ce66fd42a7
+    image: ghcr.io/voidhashh/bitstatus:1.0.1@sha256:2a28ccf699d649e8e2b7d9735ef678cd970aa08364e2f4d8ed394068d50fa222
     restart: on-failure
     stop_grace_period: 1m
     environment:
