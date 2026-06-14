@@ -1,6 +1,6 @@
 {
   "name": "bitstatus",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Monitor de saldos de wallets Bitcoin (XPUB / YPUB / ZPUB) autocontenido para Umbrel",
   "main": "server.js",
   "type": "commonjs",

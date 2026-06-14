@@ -111,15 +111,48 @@ function addressToScriptHash(address) {
   return Buffer.from(hash.reverse()).toString('hex')
 }
 
-async function getAddressBalance(address) {
+// Construye la dirección de un hijo según el tipo de script.
+function paymentAddress(child, type) {
+  let payment
+  if (type === 'p2wpkh') {
+    payment = bitcoin.payments.p2wpkh({
+      pubkey: child.publicKey,
+      network: bitcoin.networks.bitcoin,
+    })
+  } else if (type === 'p2sh') {
+    payment = bitcoin.payments.p2sh({
+      redeem: bitcoin.payments.p2wpkh({
+        pubkey: child.publicKey,
+        network: bitcoin.networks.bitcoin,
+      }),
+    })
+  } else if (type === 'p2pkh') {
+    payment = bitcoin.payments.p2pkh({
+      pubkey: child.publicKey,
+      network: bitcoin.networks.bitcoin,
+    })
+  }
+  if (!payment) throw new Error('Tipo de dirección inválido')
+  return payment.address
+}
+
+// Devuelve si la dirección se ha usado alguna vez (tiene historial) y su saldo en sats.
+// IMPORTANTE: el "uso" se mide por HISTORIAL, no por saldo. Una dirección usada y luego
+// vaciada tiene saldo 0 pero sí historial; debe contar como usada para que el gap limit
+// no se detenga antes de llegar a las direcciones de índice alto que aún tienen saldo.
+async function addressInfo(address) {
   const sh = addressToScriptHash(address)
+  const history = await electrum.blockchainScripthash_getHistory(sh)
+  const used = Array.isArray(history) && history.length > 0
+  if (!used) return { used: false, sats: 0 }
+
   const utxos = await electrum.blockchainScripthash_listunspent(sh)
-  if (!utxos || utxos.length === 0) return 0
-  return utxos.reduce((total, u) => total + u.value, 0)
+  const sats = utxos && utxos.length ? utxos.reduce((t, u) => t + u.value, 0) : 0
+  return { used: true, sats }
 }
 
 // Escanea una rama (receive=0 o change=1) de un tipo de script concreto.
-// Avanza por lotes hasta acumular GAP_LIMIT direcciones vacías seguidas.
+// Avanza por lotes hasta acumular GAP_LIMIT direcciones SIN USAR seguidas (BIP44).
 // Devuelve el total de la rama en BTC.
 async function scanBranch(root, change, type) {
   const branch = root.derive(change)
@@ -132,42 +165,18 @@ async function scanBranch(root, change, type) {
     const batch = []
 
     for (let i = 0; i < CONCURRENCY; i++) {
-      const child = branch.derive(index)
-      let payment
-
-      if (type === 'p2wpkh') {
-        payment = bitcoin.payments.p2wpkh({
-          pubkey: child.publicKey,
-          network: bitcoin.networks.bitcoin,
-        })
-      } else if (type === 'p2sh') {
-        payment = bitcoin.payments.p2sh({
-          redeem: bitcoin.payments.p2wpkh({
-            pubkey: child.publicKey,
-            network: bitcoin.networks.bitcoin,
-          }),
-        })
-      } else if (type === 'p2pkh') {
-        payment = bitcoin.payments.p2pkh({
-          pubkey: child.publicKey,
-          network: bitcoin.networks.bitcoin,
-        })
-      }
-
-      if (!payment) throw new Error('Tipo de dirección inválido')
-
-      batch.push(payment.address)
+      batch.push(paymentAddress(branch.derive(index), type))
       index++
     }
 
-    const balances = await Promise.all(
-      batch.map(a => withTimeout(getAddressBalance(a)).catch(() => 0))
+    const infos = await Promise.all(
+      batch.map(a => withTimeout(addressInfo(a)).catch(() => ({ used: false, sats: 0 })))
     )
 
-    for (const balance of balances) {
-      if (balance > 0) gap = 0
-      else gap++
-      totalSats += balance
+    for (const info of infos) {
+      if (info.used) gap = 0   // dirección usada -> reinicia el contador de huecos
+      else gap++               // dirección nunca usada -> cuenta como hueco
+      totalSats += info.sats
     }
 
     // Pequeña pausa para no saturar Electrs con ráfagas seguidas.
