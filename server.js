@@ -53,8 +53,12 @@ try {
   wallets = []
 }
 
-function saveWallets() {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(wallets, null, 2))
+// Persiste primero a disco y solo si tiene éxito actualiza el estado en memoria.
+// Así, si /data no es escribible, no quedan wallets "fantasma" en memoria (lo que
+// provocaba el "ya está añadida" tras un fallo). Lanza si la escritura falla.
+function persist(nextWallets) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(nextWallets, null, 2))
+  wallets = nextWallets
 }
 
 function loadWallets() {
@@ -255,7 +259,8 @@ app.get('/wallets', async (req, res) => {
     for (const w of wallets) {
       w.balance = await getWalletBalance(w.xpub)
     }
-    saveWallets()
+    // Si /data no es escribible no rompemos el listado; solo no cacheamos saldos.
+    try { persist(wallets) } catch (e) { console.error('No se pudieron guardar los saldos:', e.message) }
   }
 
   wallets.sort((a, b) => a.wallet.localeCompare(b.wallet))
@@ -285,8 +290,12 @@ app.post('/wallet', (req, res) => {
   const id = wallets.length > 0 ? Math.max(...wallets.map(w => w.id)) + 1 : 0
   const order = wallets.length
 
-  wallets.push({ id, order, wallet, xpub, balance: 0 })
-  saveWallets()
+  try {
+    persist([...wallets, { id, order, wallet, xpub, balance: 0 }])
+  } catch (e) {
+    console.error('Error guardando en /data:', e.message)
+    return res.status(500).json({ error: 'No se pudo guardar en /data (¿permisos del volumen?)' })
+  }
 
   res.json({ ok: true })
 })
@@ -295,8 +304,12 @@ app.post('/wallet/remove', (req, res) => {
   const xpub = (req.body.xpub || '').trim()
   if (!xpub) return res.status(400).json({ error: 'Falta la clave a eliminar' })
 
-  wallets = wallets.filter(w => w.xpub !== xpub)
-  saveWallets()
+  try {
+    persist(wallets.filter(w => w.xpub !== xpub))
+  } catch (e) {
+    console.error('Error guardando en /data:', e.message)
+    return res.status(500).json({ error: 'No se pudo guardar en /data (¿permisos del volumen?)' })
+  }
 
   res.json({ ok: true })
 })
@@ -325,9 +338,13 @@ app.post('/wallet/update', (req, res) => {
     return res.status(400).json({ error: 'Esa clave ya está añadida' })
   }
 
-  wallets[index].wallet = wallet
-  wallets[index].xpub = xpub
-  saveWallets()
+  const next = wallets.map((w, i) => (i === index ? { ...w, wallet, xpub } : w))
+  try {
+    persist(next)
+  } catch (e) {
+    console.error('Error guardando en /data:', e.message)
+    return res.status(500).json({ error: 'No se pudo guardar en /data (¿permisos del volumen?)' })
+  }
 
   res.json({ ok: true })
 })

@@ -1,0 +1,2 @@
+# Los scripts de shell DEBEN tener finales de línea LF (si no, /bin/sh falla en la imagen).
+*.sh text eol=lf

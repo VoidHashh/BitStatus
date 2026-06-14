@@ -183,7 +183,7 @@ docker buildx imagetools inspect ghcr.io/voidhashh/bitstatus:1.0.0 \
 ```
 
 Copia el `@sha256:...` resultante a la línea `image:` de `docker-compose.yml`. El digest
-ya pineado (`sha256:2a28ccf6…`) corresponde a la imagen **linux/amd64** construida y
+ya pineado (`sha256:835ed47a…`) corresponde a la imagen **linux/amd64** construida y
 verificada en este repo; re-pinéalo si publicas multi-arch o reconstruyes en otra máquina.
 
 ---
